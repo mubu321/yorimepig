@@ -1,0 +1,132 @@
+<html lang="ja"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ピンクでくそげーなクリッカーゲーム</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #ffccff; /* ピンクだよ！ */
+    }
+
+    #clickerButton {
+      font-size: 24px;
+      padding: 15px;
+      background-color: #ff66b2; /* もっと濃いピンクだよ！ */
+      color: #ffffff;
+      cursor: pointer; /* クリック可能にするよ！ */
+      border: none;
+      border-radius: 25px; /* 丸みを帯びたボタンにするよ！ */
+      margin-bottom: 20px;
+      user-select: none; /* ボタン自体も選択できないようにするよ！ */
+    }
+
+    #message {
+      font-size: 18px;
+      color: #333333; /* 黒くて読みやすいように！ */
+      margin-bottom: 20px;
+      user-select: none; /* テキストも選択できないようにするよ！ */
+    }
+
+    #progressBarContainer {
+      width: 80vw; /* スマホにも対応するために幅を変更 */
+      max-width: 300px; /* 最大幅を設定 */
+      height: 20px;
+      background-color: #ff66b2; /* ピンクのスライダーだよ！ */
+      border-radius: 10px; /* 丸みを帯びた外枠にするよ！ */
+      overflow: hidden; /* はみ出さないように制限するよ！ */
+    }
+
+    #progressBar {
+      height: 100%;
+      width: 0; /* 最初は0から始まるよ！ */
+      background-color: #ff1493; /* もっと濃いピンクのスライダーだよ！ */
+      border-radius: 10px; /* 丸みを帯びた進捗バーにするよ！ */
+      transition: width 0.3s ease; /* ちょっとアニメーション付けるよ！ */
+    }
+  </style>
+</head>
+<body>
+
+<div id="clickerContainer">
+  <button id="clickerButton">クリックしてね！</button>
+</div>
+<p id="message">クリック数: 18回</p>
+<div id="progressBarContainer">
+  <div id="progressBar" style="width: 18%;"></div>
+</div>
+
+<script>
+  const clickerButton = document.getElementById('clickerButton');
+  const messageElement = document.getElementById('message');
+  const progressBar = document.getElementById('progressBar');
+
+  const phrases = [
+    'すごい！',
+    'もっと！もっと！',
+    'おおおおおんwwwww',
+    'やったね！',
+    '楽しんでるね！',
+    'クリッカー名人だ！',
+    'エクセレント！',
+    'マスターオブクリック！',
+    'バリバリのクリッカーじゃん！',
+    'これがあなたの限界か？',
+    'おめでとう！新しいレベルだよ！',
+    'クリック三昧！',
+    'スーパーカリフラジリスティックエクスピアリドーシャス！',
+    'クリックの達人！',
+    'バカにされた感じがする？',
+    'クリックの虎だよ！',
+    'まだまだこれからだね！',
+    'もっともっと頑張ろう！',
+    'お疲れ様！',
+    'クリックで未来が変わる！',
+    '次は何が起こるかな？',
+    '次の挑戦だ！',
+    'ハイパークリッカー！',
+    '極めろ！極めてしまえ！',
+    'クリックしすぎて手が痛い？',
+    'トップクリッカーへの階段だ！',
+    'もう止まらない！クリックし続けろ！',
+    '驚異のクリック力！',
+    '感動の一撃！',
+    'コンボボーナス発動！',
+    'もっともっと速く！',
+    'これがあなたの真の力！',
+    '絶対領域のクリック！',
+    '天才クリッカーだね！',
+    '一瞬の隙もなくクリック！',
+    '誰もが認めるクリッカーの王者！',
+    '限界突破！'
+  ];
+
+  let clickCount = 0;
+
+  clickerButton.addEventListener('click', () => {
+    clickCount++;
+    updateProgressBar();
+
+    const phraseIndex = clickCount % phrases.length; // 100回ごとに順番に表示するよ！
+
+    if (clickCount % 100 === 0) {
+      messageElement.textContent = `クリック数: ${clickCount}回 - ${phrases[phraseIndex]}`;
+    } else {
+      messageElement.textContent = `クリック数: ${clickCount}回`;
+    }
+  });
+
+  function updateProgressBar() {
+    const progress = (clickCount % 100) / 100; // クリック数を進捗率に変換
+    progressBar.style.width = `${progress * 100}%`; // 進捗率を進捗バーに反映
+  }
+</script>
+
+
+
+
+</body></html>
