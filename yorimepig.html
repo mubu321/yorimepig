@@ -1,4 +1,6 @@
-<html lang="ja"><head>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ピンクでくそげーなクリッカーゲーム</title>
@@ -11,6 +13,7 @@
       height: 100vh;
       margin: 0;
       background-color: #ffccff; /* ピンクだよ！ */
+      touch-action: manipulation; /* ダブルタップでの拡大を無効化するよ！ */
     }
 
     #clickerButton {
@@ -23,6 +26,7 @@
       border-radius: 25px; /* 丸みを帯びたボタンにするよ！ */
       margin-bottom: 20px;
       user-select: none; /* ボタン自体も選択できないようにするよ！ */
+      touch-action: manipulation; /* ダブルタップでの拡大を無効化するよ！ */
     }
 
     #message {
@@ -30,6 +34,7 @@
       color: #333333; /* 黒くて読みやすいように！ */
       margin-bottom: 20px;
       user-select: none; /* テキストも選択できないようにするよ！ */
+      touch-action: manipulation; /* ダブルタップでの拡大を無効化するよ！ */
     }
 
     #progressBarContainer {
@@ -39,6 +44,7 @@
       background-color: #ff66b2; /* ピンクのスライダーだよ！ */
       border-radius: 10px; /* 丸みを帯びた外枠にするよ！ */
       overflow: hidden; /* はみ出さないように制限するよ！ */
+      touch-action: manipulation; /* ダブルタップでの拡大を無効化するよ！ */
     }
 
     #progressBar {
@@ -47,6 +53,7 @@
       background-color: #ff1493; /* もっと濃いピンクのスライダーだよ！ */
       border-radius: 10px; /* 丸みを帯びた進捗バーにするよ！ */
       transition: width 0.3s ease; /* ちょっとアニメーション付けるよ！ */
+      touch-action: manipulation; /* ダブルタップでの拡大を無効化するよ！ */
     }
   </style>
 </head>
@@ -126,7 +133,6 @@
   }
 </script>
 
+</body>
+</html>
 
-
-
-</body></html>
