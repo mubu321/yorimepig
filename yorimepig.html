@@ -139,7 +139,7 @@
     const phraseIndex = clickCount % 30; // 30回ごとに順番に表示するよ！
 
     if (clickCount % 30 === 0) {
-      messageElement.textContent = `クリック数: ${clickCount}回 - 画像が選択されました！`;
+      messageElement.textContent = `クリック数: ${clickCount}回 - `;
       setTimeout(() => {
         messageElement.textContent = 'クリック数: 0回';
       }, 1500); /* 1.5秒後にメッセージをリセット */
