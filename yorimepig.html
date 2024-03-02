@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ピンクでくそげーなクリッカーゲーム</title>
+  <title>ダメージ写真ゲーム</title>
   <style>
     body {
       display: flex;
@@ -16,25 +16,58 @@
       touch-action: manipulation; /* ダブルタップでの拡大を無効化するよ！ */
     }
 
-    #clickerButton {
-      font-size: 24px;
+    #fileInputContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #fileInput {
+      margin: 20px;
+      opacity: 0; /* 透明にする */
+      position: absolute;
+      z-index: -1; /* 背後に隠す */
+    }
+
+    #fileInputLabel {
+      font-size: 20px;
       padding: 15px;
-      background-color: #ff66b2; /* もっと濃いピンクだよ！ */
+      background-color: #ff66b2; /* ピンクのスライダーだよ！ */
       color: #ffffff;
+      border-radius: 10px; /* 丸みを帯びた外枠にするよ！ */
+      cursor: pointer; /* クリック可能にするよ！ */
+    }
+
+    #clickerContainer {
+      display: none; /* 最初は非表示 */
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    #clickerButton {
+      font-size: 0; /* テキストは非表示 */
+      padding: 0;
+      background: none;
       cursor: pointer; /* クリック可能にするよ！ */
       border: none;
-      border-radius: 25px; /* 丸みを帯びたボタンにするよ！ */
       margin-bottom: 20px;
       user-select: none; /* ボタン自体も選択できないようにするよ！ */
       touch-action: manipulation; /* ダブルタップでの拡大を無効化するよ！ */
     }
 
+    #clickerButton img {
+      width: 150px; /* 画像のサイズを調整 */
+      height: auto; /* アスペクト比を保つようにする */
+      border-radius: 25px; /* 丸みを帯びたボタンにするよ！ */
+      transition: filter 0.3s ease; /* フィルターにアニメーション */
+    }
+
     #message {
       font-size: 18px;
-      color: #333333; /* 黒くて読みやすいように！ */
-      margin-bottom: 20px;
-      user-select: none; /* テキストも選択できないようにするよ！ */
-      touch-action: manipulation; /* ダブルタップでの拡大を無効化するよ！ */
+      color: #333333;
+      margin-top: 10px;
     }
 
     #progressBarContainer {
@@ -59,76 +92,71 @@
 </head>
 <body>
 
-<div id="clickerContainer">
-  <button id="clickerButton">クリックしてね！</button>
+<div id="fileInputContainer">
+  <input type="file" id="fileInput" accept="image/*" onchange="startGame()" style="display: none;">
+  <label for="fileInput" id="fileInputLabel">ファイルを選択してください。</label>
 </div>
-<p id="message">クリック数: 18回</p>
-<div id="progressBarContainer">
-  <div id="progressBar" style="width: 18%;"></div>
+
+<div id="clickerContainer">
+  <button id="clickerButton" onclick="dealDamage()">
+    <img src="blob:null/db123cbe-6fc9-4f9a-bf72-14525ceabe56" alt="Selected Image">
+  </button>
+  <p id="message">クリック数: 3回</p>
+  <div id="progressBarContainer">
+    <div id="progressBar" style="width: 10%;"></div>
+  </div>
 </div>
 
 <script>
+  const fileInput = document.getElementById('fileInput');
+  const fileInputLabel = document.getElementById('fileInputLabel');
+  const clickerContainer = document.getElementById('clickerContainer');
   const clickerButton = document.getElementById('clickerButton');
   const messageElement = document.getElementById('message');
   const progressBar = document.getElementById('progressBar');
-
-  const phrases = [
-    'すごい！',
-    'もっと！もっと！',
-    'おおおおおんwwwww',
-    'やったね！',
-    '楽しんでるね！',
-    'クリッカー名人だ！',
-    'エクセレント！',
-    'マスターオブクリック！',
-    'バリバリのクリッカーじゃん！',
-    'これがあなたの限界か？',
-    'おめでとう！新しいレベルだよ！',
-    'クリック三昧！',
-    'スーパーカリフラジリスティックエクスピアリドーシャス！',
-    'クリックの達人！',
-    'バカにされた感じがする？',
-    'クリックの虎だよ！',
-    'まだまだこれからだね！',
-    'もっともっと頑張ろう！',
-    'お疲れ様！',
-    'クリックで未来が変わる！',
-    '次は何が起こるかな？',
-    '次の挑戦だ！',
-    'ハイパークリッカー！',
-    '極めろ！極めてしまえ！',
-    'クリックしすぎて手が痛い？',
-    'トップクリッカーへの階段だ！',
-    'もう止まらない！クリックし続けろ！',
-    '驚異のクリック力！',
-    '感動の一撃！',
-    'コンボボーナス発動！',
-    'もっともっと速く！',
-    'これがあなたの真の力！',
-    '絶対領域のクリック！',
-    '天才クリッカーだね！',
-    '一瞬の隙もなくクリック！',
-    '誰もが認めるクリッカーの王者！',
-    '限界突破！'
-  ];
-
   let clickCount = 0;
 
-  clickerButton.addEventListener('click', () => {
+  function startGame() {
+    const selectedFile = fileInput.files[0];
+    if (selectedFile) {
+      fileInputLabel.style.display = 'none'; /* ラベル非表示 */
+      fileInput.style.display = 'none'; /* ファイル選択非表示 */
+      clickerContainer.style.display = 'flex'; /* クリッカーコンテナ表示 */
+      clickerButton.getElementsByTagName('img')[0].src = URL.createObjectURL(selectedFile); /* 画像セット */
+      clickCount = 0; /* クリック数リセット */
+      updateProgressBar(); /* 進捗バー更新 */
+    }
+  }
+
+  function dealDamage() {
     clickCount++;
     updateProgressBar();
+    clickerButton.getElementsByTagName('img')[0].style.filter = 'brightness(50%)'; /* 画像をダメージ風に暗くする */
+    setTimeout(() => {
+      clickerButton.getElementsByTagName('img')[0].style.filter = 'brightness(100%)'; /* 0.3秒後に元に戻す */
+    }, 300);
 
-    const phraseIndex = clickCount % phrases.length; // 100回ごとに順番に表示するよ！
+    const phraseIndex = clickCount % 30; // 30回ごとに順番に表示するよ！
 
-    if (clickCount % 100 === 0) {
-      messageElement.textContent = `クリック数: ${clickCount}回 - ${phrases[phraseIndex]}`;
+    if (clickCount % 30 === 0) {
+      messageElement.textContent = `クリック数: ${clickCount}回 - 画像が選択されました！`;
+      setTimeout(() => {
+        messageElement.textContent = 'クリック数: 0回';
+      }, 1500); /* 1.5秒後にメッセージをリセット */
     } else {
       messageElement.textContent = `クリック数: ${clickCount}回`;
     }
-  });
+
+    if (clickCount === 30) {
+      setTimeout(() => {
+        clickCount = 0; /* クリック数リセット */
+        updateProgressBar(); /* 進捗バー更新 */
+      }, 1500); /* 1.5秒後にクリック数リセット */
+    }
+  }
 
   function updateProgressBar() {
-    const progress = (clickCount % 100) / 100; // クリック数を進捗率に変換
+    const progress = clickCount / 30; // クリック数を進捗率に変換
     progressBar.style.width = `${progress * 100}%`; // 進捗率を進捗バーに反映
   }
 </script>
