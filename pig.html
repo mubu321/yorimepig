@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>音声再生サイト</title>
+  <style>
+    body {
+      background-color: #ffe6f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    #player {
+      width: 300px;
+      text-align: center;
+    }
+    button {
+      background-color: #ff66b2;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+    input[type="file"] {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="player">
+    <!-- スロット1 -->
+    <input type="file" accept="audio/*" id="soundInput1" style="display:none;">
+    <button onclick="document.getElementById('soundInput1').click()">音声アップ</button>
+    <button onclick="playSound(1)">再生</button>
+
+    <!-- スロット2 -->
+    <input type="file" accept="audio/*" id="soundInput2" style="display:none;">
+    <button onclick="document.getElementById('soundInput2').click()">音声アップ</button>
+    <button onclick="playSound(2)">再生</button>
+
+    <!-- スロット3 -->
+    <input type="file" accept="audio/*" id="soundInput3" style="display:none;">
+    <button onclick="document.getElementById('soundInput3').click()">音声アップ</button>
+    <button onclick="playSound(3)">再生</button>
+
+    <!-- スロット4 -->
+    <input type="file" accept="audio/*" id="soundInput4" style="display:none;">
+    <button onclick="document.getElementById('soundInput4').click()">音声アップ</button>
+    <button onclick="playSound(4)">再生</button>
+
+    <!-- スロット5 -->
+    <input type="file" accept="audio/*" id="soundInput5" style="display:none;">
+    <button onclick="document.getElementById('soundInput5').click()">音声アップ</button>
+    <button onclick="playSound(5)">再生</button>
+
+    <!-- スロット6 -->
+    <input type="file" accept="audio/*" id="soundInput6" style="display:none;">
+    <button onclick="document.getElementById('soundInput6').click()">音声アップ</button>
+    <button onclick="playSound(6)">再生</button>
+
+    <!-- スロット7 -->
+    <input type="file" accept="audio/*" id="soundInput7" style="display:none;">
+    <button onclick="document.getElementById('soundInput7').click()">音声アップ</button>
+    <button onclick="playSound(7)">再生</button>
+
+    <!-- スロット8 -->
+    <input type="file" accept="audio/*" id="soundInput8" style="display:none;">
+    <button onclick="document.getElementById('soundInput8').click()">音声アップ</button>
+    <button onclick="playSound(8)">再生</button>
+
+    <!-- スロット9 -->
+    <input type="file" accept="audio/*" id="soundInput9" style="display:none;">
+    <button onclick="document.getElementById('soundInput9').click()">音声アップ</button>
+    <button onclick="playSound(9)">再生</button>
+
+    <!-- スロット10 -->
+    <input type="file" accept="audio/*" id="soundInput10" style="display:none;">
+    <button onclick="document.getElementById('soundInput10').click()">音声アップ</button>
+    <button onclick="playSound(10)">再生</button>
+
+    <!-- スロット11 -->
+    <input type="file" accept="audio/*" id="soundInput11" style="display:none;">
+    <button onclick="document.getElementById('soundInput11').click()">音声アップ</button>
+    <button onclick="playSound(11)">再生</button>
+
+    <!-- スロット12 -->
+    <input type="file" accept="audio/*" id="soundInput12" style="display:none;">
+    <button onclick="document.getElementById('soundInput12').click()">音声アップ</button>
+    <button onclick="playSound(12)">再生</button>
+
+    <!-- スロット13 -->
+    <input type="file" accept="audio/*" id="soundInput13" style="display:none;">
+    <button onclick="document.getElementById('soundInput13').click()">音声アップ</button>
+    <button onclick="playSound(13)">再生</button>
+
+    <!-- スロット14 -->
+    <input type="file" accept="audio/*" id="soundInput14" style="display:none;">
+    <button onclick="document.getElementById('soundInput14').click()">音声アップ</button>
+    <button onclick="playSound(14)">再生</button>
+
+    <!-- スロット15 -->
+    <input type="file" accept="audio/*" id="soundInput15" style="display:none;">
+    <button onclick="document.getElementById('soundInput15').click()">音声アップ</button>
+    <button onclick="playSound(15)">再生</button>
+  </div>
+
+  <script>
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(slot) {
+      const soundInput = document.getElementById(`soundInput${slot}`);
+
+      if (soundInput.files.length > 0) {
+        const fileReader = new FileReader();
+
+        fileReader.onload = function(e) {
+          audioContext.decodeAudioData(e.target.result, function(buffer) {
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioContext.destination);
+            source.start();
+          });
+        };
+
+        fileReader.readAsArrayBuffer(soundInput.files[0]);
+      } else {
+        alert(`スロット ${slot} に音声をアップロードしてね！`);
+      }
+    }
+
+    function createSlot(slot) {
+      const slotContainer = document.getElementById('player');
+      const input = document.createElement('input');
+      const uploadButton = document.createElement('button');
+      const playButton = document.createElement('button');
+
+      input.type = 'file';
+      input.accept = 'audio/*';
+      input.id = `soundInput${slot}`;
+      input.style.display = 'none';
+
+      uploadButton.innerText = '音声アップ';
+      uploadButton.onclick = () => document.getElementById(`soundInput${slot}`).click();
+
+      playButton.innerText = '再生';
+      playButton.onclick = () => playSound(slot);
+
+      slotContainer.appendChild(input);
+      slotContainer.appendChild(uploadButton);
+      slotContainer.appendChild(playButton);
+    }
+
+    for (let i = 1; i <= 15; i++) {
+      createSlot(i);
+    }
+  </script>
+</body>
+</html>
