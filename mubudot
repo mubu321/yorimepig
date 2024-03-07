@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>mubudot</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+    }
+    canvas {
+      display: block;
+    }
+    input[type="color"],
+    button {
+      position: absolute;
+      z-index: 1;
+      border: none;
+      border-radius: 10px; 
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transform-origin: center bottom;
+      transform: translateY(100%);
+    }
+    input[type="color"] {
+      top: 10px;
+      left: 10px;
+    }
+    input#colorPicker {
+      top: 10px;
+      left: 10px;
+    }
+    input#backgroundColorPicker {
+      top: 10px;
+      left: 80px;
+    }
+    label {
+      position: absolute;
+      z-index: 1;
+      font-size: 16px;
+      color: #fff;
+      top: 10px;
+      left: 440px;
+    }
+    input#lineWidthRange {
+      position: absolute;
+      z-index: 1;
+      top: 10px;
+      left: 530px;
+    }
+    button {
+      font-weight: bold;
+      background-color: #808080; 
+      color: #fff;
+    }
+    button#resetButton {
+      top: 10px;
+      left: 150px;
+    }
+    button#undoButton {
+      top: 10px;
+      left: 220px;
+    }
+    button#saveButton {
+      top: 10px;
+      left: 290px;
+    }
+    button#loadButton {
+      top: 10px;
+      left: 360px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="1357" height="958"></canvas>
+  <input type="color" id="colorPicker" value="#808080"> 
+  <input type="color" id="backgroundColorPicker" value="#87CEEB">
+  <label for="lineWidthRange">線の太さ:</label>
+  <input type="range" id="lineWidthRange" min="1" max="20" value="5">
+  <button id="resetButton">Reset</button>
+  <button id="undoButton">Undo</button>
+  <button id="saveButton">Save</button>
+  <button id="loadButton">Load</button>
+  <input type="file" id="fileInput" style="display: none;">
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const colorPicker = document.getElementById('colorPicker');
+    const backgroundColorPicker = document.getElementById('backgroundColorPicker');
+    const lineWidthRange = document.getElementById('lineWidthRange');
+    const resetButton = document.getElementById('resetButton');
+    const undoButton = document.getElementById('undoButton');
+    const saveButton = document.getElementById('saveButton');
+    const loadButton = document.getElementById('loadButton');
+    const fileInput = document.getElementById('fileInput');
+
+    const gridSize = 10;
+    let currentColor = colorPicker.value;
+    let backgroundColor = backgroundColorPicker.value;
+    let currentLineWidth = lineWidthRange.value;
+
+    const blocks = [];
+    const blocksHistory = [];
+    let isDrawing = false;
+
+    let isDrawingEnabled = true;
+
+    function drawBackground() {
+      ctx.fillStyle = backgroundColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function drawBlock(x, y) {
+      const blockX = Math.floor(x / gridSize) * gridSize;
+      const blockY = Math.floor(y / gridSize) * gridSize;
+
+      const newBlock = { x: blockX, y: blockY, color: { ...currentColorRGB }, opacity: 1 };
+      blocks.push(newBlock);
+      blocksHistory.push([...blocks]);
+    }
+
+    function drawBlocks() {
+      for (const block of blocks) {
+        ctx.fillStyle = `rgba(${block.color.r}, ${block.color.g}, ${block.color.b}, ${block.opacity})`;
+        ctx.fillRect(block.x, block.y, gridSize, gridSize);
+        ctx.strokeStyle = `rgba(${block.color.r}, ${block.color.g}, ${block.color.b}, ${block.opacity})`;
+        ctx.lineWidth = currentLineWidth;
+        ctx.strokeRect(block.x, block.y, gridSize, gridSize);
+      }
+    }
+
+    function update() {
+      drawBackground();
+      drawBlocks();
+    }
+
+    function handleMouseOrTouchDown(e) {
+      if (isDrawingEnabled) {
+        isDrawing = true;
+        drawBlock(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+      }
+      e.preventDefault();
+    }
+
+    function handleMouseOrTouchMove(e) {
+      if (isDrawingEnabled && isDrawing) {
+        drawBlock(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+      }
+    }
+
+    function handleMouseOrTouchUp() {
+      if (isDrawingEnabled) {
+        isDrawing = false;
+      }
+    }
+
+    function handleUndo() {
+      if (isDrawingEnabled && blocksHistory.length > 1) {
+        blocksHistory.pop();
+        blocks.length = 0;
+        blocks.push(...blocksHistory[blocksHistory.length - 1]);
+      }
+    }
+
+    function handleReset() {
+      if (isDrawingEnabled) {
+        blocks.length = 0;
+        blocksHistory.length = 0;
+      }
+    }
+
+    function handleSave() {
+      if (isDrawingEnabled) {
+        const dataToSave = JSON.stringify(blocks);
+        downloadFile(dataToSave, 'savedData.txt');
+      }
+    }
+
+    function handleLoad() {
+      if (isDrawingEnabled) {
+        fileInput.click();
+      }
+    }
+
+    function handleFileInputChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const loadedData = e.target.result;
+          blocks.length = 0;
+          blocks.push(...JSON.parse(loadedData));
+          blocksHistory.length = 0;
+          blocksHistory.push([...blocks]);
+        };
+        reader.readAsText(file);
+      }
+    }
+
+    function downloadFile(content, filename) {
+      const blob = new Blob([content], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    colorPicker.addEventListener('input', () => {
+      currentColor = colorPicker.value;
+      updateCurrentColorRGB();
+    });
+
+    backgroundColorPicker.addEventListener('input', () => {
+      backgroundColor = backgroundColorPicker.value;
+    });
+
+    lineWidthRange.addEventListener('input', () => {
+      currentLineWidth = lineWidthRange.value;
+    });
+
+    resetButton.addEventListener('click', handleReset);
+    undoButton.addEventListener('click', handleUndo);
+    saveButton.addEventListener('click', handleSave);
+    loadButton.addEventListener('click', handleLoad);
+    fileInput.addEventListener('change', handleFileInputChange);
+
+    canvas.addEventListener('mousedown', handleMouseOrTouchDown);
+    canvas.addEventListener('mousemove', handleMouseOrTouchMove);
+    canvas.addEventListener('mouseup', handleMouseOrTouchUp);
+
+    canvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
+
+    canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      handleMouseOrTouchDown(e.touches[0]);
+    });
+
+    canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      handleMouseOrTouchMove(e.touches[0]);
+    });
+
+    canvas.addEventListener('touchend', handleMouseOrTouchUp);
+
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      update();
+      requestAnimationFrame(gameLoop);
+    }
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+
+    function fadeInAndMoveButton(button, delay) {
+      setTimeout(() => {
+        button.style.opacity = 1;
+        button.style.transform = 'translateY(0%)';
+        button.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+      }, delay);
+    }
+
+    fadeInAndMoveButton(resetButton, 0);
+    fadeInAndMoveButton(undoButton, 200);
+    fadeInAndMoveButton(saveButton, 400);
+    fadeInAndMoveButton(loadButton, 600);
+
+    resizeCanvas();
+    gameLoop();
+
+    function updateCurrentColorRGB() {
+      const hexColor = currentColor.substring(1);
+      currentColorRGB.r = parseInt(hexColor.substring(0, 2), 16);
+      currentColorRGB.g = parseInt(hexColor.substring(2, 4), 16);
+      currentColorRGB.b = parseInt(hexColor.substring(4, 6), 16);
+    }
+
+    const currentColorRGB = { r: 128, g: 128, b: 128 };
+  </script>
+</body>
+</html>
